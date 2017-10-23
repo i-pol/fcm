@@ -155,6 +155,19 @@ class FCM
     end
   end
 
+  def send_to_topics(topics, options = {})
+       body = { condition: topics.map { |topic| "'#{topic}' in topics" }.join(" && ") }.merge(options)
+       params = {
+          body: body.to_json,
+          headers: {
+          'Authorization' => "key=#{@api_key}",
+          'Content-Type' => 'application/json'
+          }
+       }
+       response = self.class.post('/send', params.merge(@client_options))
+       build_response(response)
+  end
+  
   private
 
   def for_uri(uri)
